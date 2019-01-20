@@ -1,0 +1,16 @@
+{% extends 'common.html' %}
+{% block content_1 %}
+Регистрация нового пользователя
+{% endblock %}
+{% block content_2 %}
+<form method="post" action="/register">
+{% endblock %}
+{% block content_3 %}
+ <div class="form-group">
+    <label for="formGroupExampleInput">E-mail</label>
+    <input type="text" class="form-control" placeholder="Введите свой e-mail" name="email" >
+  </div>
+{% endblock %}
+{% block content_4 %}
+Завершить регистрацию
+{% endblock %}
