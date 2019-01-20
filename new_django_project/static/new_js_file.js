@@ -281,3 +281,4 @@ console.log(ex_14_11_2(5, 11))
 function ex_14_14(ls){
 
 }
+console.log('exercise 14.14')
