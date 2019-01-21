@@ -276,9 +276,55 @@ function ex_14_11_2(a, b){
     return res
 }
 console.log('exercise 14.11_2: ')
-console.log(ex_14_11_2(5, 11))
+//console.log(ex_14_11_2(5, 11))
 
 function ex_14_14(ls){
+    console.log('   ' + ls[0])
+    x = ls[0].toString().length + 3
+    for(idx in ls){
+        if (idx==0){
+            continue
+        }
+        n = x - ls[idx].toString().length
+        console.log(' '.repeat(n) + ls[idx])
+    }
 
 }
 console.log('exercise 14.14')
+//console.log(ex_14_14([243, 4, 32, 6778, 44, 3, 277]))
+
+function ex_14_16(ls){
+    console.log('первоначальный вариант: ' + ls)
+    n=1
+    while (n<3) {
+        x = 0
+        while (x < ls.length-1 ) {
+            if (ls[x] > ls[x + 1]) {
+                k = ls[x]
+                ls[x] = ls[x + 1]
+                ls[x + 1] = k
+            }
+            x = x+1
+            console.log(n +'-ая прогонка: ' + ls)
+        }
+        n = n+1
+    }
+
+        console.log('ls:' + ls)
+        console.log('последний элемент ' + ls[ls.length-1] + '\nпредпоследний элемент ' + ls[ls.length-2])
+        return ls
+
+}
+
+console.log('exercise 14.16')
+//ex_14_16([3, 66, 22, 5, 667, 31, 23, 11, 2, 7, 0, 4, 44])
+
+function ex_14_18(n){
+    console.log('* '.repeat(n))
+    console.log(('*' + ' '.repeat(2*n-3) + '*\n').repeat(n-2))
+    console.log('* '.repeat(n))
+}
+console.log('exercise 14.18')
+ex_14_18(8)
+
+function ex_14_20(a, b)
