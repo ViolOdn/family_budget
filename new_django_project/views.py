@@ -200,6 +200,7 @@ def no_cash(request):
         i = i+1
     delta = (datetime.now()-start).total_seconds()
     time = str(delta) + ' seconds'
+    #ttgf
     return HttpResponse(time)
 
 
