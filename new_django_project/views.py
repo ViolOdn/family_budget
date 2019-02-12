@@ -1,28 +1,49 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 import datetime
-from new_django_project.models import Family
 from django.shortcuts import render_to_response
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
-from new_django_project.models import Family
+from new_django_project.models import Categories, FlowOfFunds, ExpensesPlan
 import re
-
+from django.http import JsonResponse
+import requests
+from datetime import datetime, timedelta
+import random
+from django.utils.translation import ugettext as _
 
 def myfunc(request):
     s = ''
-    for x in Family.objects.all():
+    for x in User.objects.all():
         s = s + x.family_name + ' '
 
     return HttpResponse(s)
 
 
 def main_page(request):
+    incomes = {}
+    incomes = FlowOfFunds.objects.filter(is_it_expense=False)
+    expenses = FlowOfFunds.objects.filter(is_it_expense=True)
+    sum = 0
+    for inc in incomes:
+        sum = sum + inc.sum
+    for exp in expenses:
+        sum = sum - exp.sum
+
     if request.user.is_authenticated:
-        return render_to_response('index.html', {'name': request.user.username, 'flag': True})
+        #all_user_flows = {'flows': FlowOfFunds.objects.filter(family_id=request.user)}
+        '''
+        записать новый словарь с нужными полями из расходов, потом его по значению передать на главную в таблицу
+        '''
+        return render_to_response('index.html', {'name': request.user.username, 'flag': True,\
+                                                 'flows': FlowOfFunds.objects.filter(family_id=request.user),\
+                                                 'money': sum})
     else:
         return render_to_response('index.html', {'flag': False})
+
+
+
 
 
 def homework(request):
@@ -58,16 +79,85 @@ def show_registration_form(request):
 
 
 def register(request):
-    while True:
-        if '@' in request.POST['email']:
-            break
-        else:
-            return HttpResponse('Введите корректный e-mail')
     user = User.objects.create_user(
         request.POST['username'],
-        password=request.POST['password']
+        password=request.POST['password'],
+        email=request.POST['email']
     )
-
-    family = Family(family_name=user, family_email=request.POST['email'], password_hash='123')
-    family.save()
     return HttpResponseRedirect('/login_form')
+
+
+def ajax_path(request):
+    response = {
+    'message': request.POST['a']
+    }
+    return JsonResponse(response)
+
+
+def check_name(request):
+    ls = []
+    for n in User.objects.all():
+       ls.append(n.username)
+    s = request.POST['name']
+    if s in ls:
+        response = 1
+    else:
+        response = 0
+    return JsonResponse({'flag':response})
+
+
+def show_categories(request):
+    cat = {'categories': Categories.objects.filter(family_id=request.user)}
+    return render_to_response('add_new_type.html', cat)
+
+
+def add_type(request):
+    categories = Categories(family_id=request.user, type_name=request.POST['expense_type'])
+    categories.save()
+    return HttpResponseRedirect('/')
+
+'''
+def get_rates_7_days(request):
+    finish_period = datetime.today()
+    start_period = finish_period - timedelta(days = 7)
+    response = requests.get('http://www.nbrb.by/API/ExRates/Rates/Dynamics/{150}?StartDate=' + start_period + '&' + finish_period)
+'''
+
+'''
+Для индекс.хтмл:
+            <select name="select" size="1">
+            {%for category in categories%}
+                <option selected value="s"> {{category.type_name}}</option>
+              {% endfor %}
+            </select>
+            Из первостепенного:
+            добавление расходов/доходов +
+            преобразование дат в соответствующий формат +
+            пересчет остатка +
+            отображение таблиц
+            пересчет планов
+            Настройки:
+            - накопления
+            - день зп
+            - 
+'''
+
+
+def add_new_flow_of_funds(request):
+    if request.POST['expense_or_income'] == '-':
+        exp_type = True
+    else:
+        exp_type = False
+    s = Categories.objects.filter(family_id=request.user)
+    type = s.filter(type_name=request.POST['flow_type_choise'])
+    old_sum = request.POST['flow_sum']
+    if ',' in request.POST['flow_sum']:
+        float_sum = old_sum.replace(',', '.')
+    else:
+        float_sum = request.POST['flow_sum']
+    flow_of_funds = FlowOfFunds(family_id=request.user, sum=float_sum, \
+                              type_id=type.first(), description=request.POST['flow_description'], \
+                                date=request.POST['flow_date'], is_it_expense=exp_type)
+    flow_of_funds.save()
+    return HttpResponseRedirect('/')
+    #return HttpResponse('Расход/доход добавлен. Нажмите кнопку "назад" или Backspace, чтобы вернуться на главную страницу')
