@@ -193,6 +193,7 @@ def no_cash(request):
     expenses = []
     i = 1
     types = []
+    time = ''
     while i < 30000:
         s = FlowOfFunds.objects.filter(family_id=random.randint(1, 4)).first()
         k = FlowOfFunds.objects.filter(type_id=random.randint(1, 4)).first()
@@ -200,5 +201,6 @@ def no_cash(request):
         types.append(k)
         i = i+1
     delta = (datetime.now()-start).total_seconds()
-    return HttpResponse(str(delta))
+    time = str(delta) + ' seconds'
+    return HttpResponse(time)
 
