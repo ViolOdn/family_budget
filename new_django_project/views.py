@@ -12,6 +12,8 @@ import requests
 from datetime import datetime, timedelta
 import random
 from django.utils.translation import ugettext as _
+from pymemcache import Client
+import pickle
 
 def myfunc(request):
     s = ''
@@ -161,3 +163,42 @@ def add_new_flow_of_funds(request):
     flow_of_funds.save()
     return HttpResponseRedirect('/')
     #return HttpResponse('Расход/доход добавлен. Нажмите кнопку "назад" или Backspace, чтобы вернуться на главную страницу')
+
+
+def cash_test(request):
+    start = datetime.now()
+    client = Client(('localhost', 11211))
+    expenses = client.get('expenses')
+    if expenses is None:
+        expenses = []
+        i = 1
+        while i < 30000:
+            s = FlowOfFunds.objects.filter(family_id=random.randint(1, 4)).first()
+            expenses.append(s)
+            i = i+1
+        client.set(
+            'expenses',
+            pickle.dumps(expenses),
+            expire=60
+        )
+    else:
+        expenses = pickle.loads(expenses)
+    finish = datetime.now()
+    delta = (finish-start).total_seconds()
+    return HttpResponse(str(delta))
+
+
+def no_cash(request):
+    start = datetime.now()
+    expenses = []
+    i = 1
+    types = []
+    while i < 30000:
+        s = FlowOfFunds.objects.filter(family_id=random.randint(1, 4)).first()
+        k = FlowOfFunds.objects.filter(type_id=random.randint(1, 4)).first()
+        expenses.append(s)
+        types.append(k)
+        i = i+1
+    delta = (datetime.now()-start).total_seconds()
+    return HttpResponse(str(delta))
+

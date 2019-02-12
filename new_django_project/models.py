@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
+from django import utils
 
 '''
 class Family(models.Model):
@@ -33,7 +34,8 @@ class FlowOfFunds(models.Model):
     sum = models.FloatField(default=0)
     type_id = models.ForeignKey(Categories, on_delete=models.CASCADE, default=1)
     description = models.CharField(max_length=100)
-    date = models.DateField(default=datetime.date(datetime.today()))
+    #date = models.DateField(default=datetime.date(datetime.today()))
+    date = models.DateField(default=utils.timezone.now)
     is_it_expense = models.BooleanField(default=True)
 
 

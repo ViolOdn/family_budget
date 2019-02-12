@@ -327,4 +327,41 @@ function ex_14_18(n){
 console.log('exercise 14.18')
 ex_14_18(8)
 
-function ex_14_20(a, b)
+function ex_14_20(a, b){
+    ls = []
+    if (a%2 == 0){
+        n = 0
+        while(n <= b-2){
+            ls.push(a+n)
+            n = n+2
+        }
+    }
+        else {
+            n = 1
+            while(n <= b-2){
+                ls.push(a+n)
+                n = n+2
+        }
+    }
+        return ls
+}
+
+console.log('exercise 14.20')
+console.log(ex_14_20(3, 18))
+
+function ex_14_22(sum, percent, month){
+    console.log('сумма на начало месяца     сумма на конец месяца')
+    n = 1
+    old_sum = sum
+    while(n <= month){
+        old_sum = old_sum
+        new_sum = (old_sum+old_sum*percent/100)
+    console.log('            ' + old_sum.toFixed(2) + '                ' + new_sum.toFixed(2))
+        old_sum = new_sum
+        n = n+1
+        }
+        return new_sum
+}
+
+console.log('exercise 14.22')
+console.log(ex_14_22(100, 3, 12))

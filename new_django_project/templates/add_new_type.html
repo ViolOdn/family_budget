@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить новый тип дохода или расхода</title>
+</head>
+<body>
+<div>
+    <div align=" center " size="+2"><b>Типы расходов и доходов</b></div>
+          <table border="1">
+              {%for category in categories%}
+              <tr>
+                  <td> {{category.type_name}} </td>
+              </tr>
+              {% endfor %}
+          </table>
+<p> </p>
+</div>
+</div>
+
+<form method="post" action="/add_type">
+  <div class="form-group">
+    <label for="formGroupExampleInput">Тип расхода</label>
+    <input type="text" class="form-control" placeholder="название группы расходов" name="expense_type" id="exp_type" >
+  </div>
+     <button type="submit" class="btn btn-primary" id="finish_add_type"> Добавить новый тип расхода </button>
+</form>
+
+</body>
+</html>
