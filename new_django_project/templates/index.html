@@ -40,16 +40,20 @@
               </tr>
 
               {%for flow in flows%}
-
-
               <tr style="background-color:
-                      {% if flow.is_it_expense == True%}
+                      {% if flow.sum <= 0%}
                       #FFD5D5
                   {% else %}
                    #D5FFD6
                        {% endif %}
                       ">
-                  <td> {{flow.sum}} </td>
+                  <td> {% if flow.sum <= 0 %}
+                  {{ flow.sum|stringformat:"+d"|slice:"1:" }}
+                      {% else %}
+                      {{ flow.sum }}
+                      {% endif %}
+
+                  </td>
                   <td> {{flow.type_id.type_name}} </td>
                   <td> {{flow.description}} </td>
                   <td> {{flow.date}} </td>
@@ -87,11 +91,6 @@
     <input type="date" class="form-control" placeholder="гггг-мм-чч или оставьте поле пустым для текущей даты" name="flow_date" >
   </div>
 
-      <div class="form-group">
-    <label for="formGroupExampleInput">Это расход или доход?</label>
-    <input type="text" class="form-control" placeholder="поставьте - для расхода или + для дохода" name="expense_or_income" >
-  </div>
-
     <button type="submit" class="btn btn-primary" id="add_flow"> Добавить расход/доход </button>
 </form>
 
@@ -107,42 +106,14 @@
               <td><b>Потрачено</b></td>
               <td><b>Остаток</b></td>
               </tr>
+              {% for plan in plans %}
               <tr>
-              <td>Мероприятия</td>
+              <td>{{ plan }}</td>
               <td>150</td>
               <td>70</td>
               <td>80</td>
               </tr>
-               <tr>
-              <td>Еда</td>
-              <td>500</td>
-              <td>139</td>
-              <td>361</td>
-              </tr>
-                 <tr>
-              <td>Одежда</td>
-              <td>100</td>
-              <td>80</td>
-              <td>20</td>
-              </tr>
-              <tr>
-              <td>Алкоголь</td>
-              <td>50</td>
-              <td>10</td>
-              <td>40</td>
-              </tr>
-              <tr>
-              <td>Коты</td>
-              <td>50</td>
-              <td>50</td>
-              <td>0</td>
-              </tr>
-              <tr>
-              <td>Лекарства</td>
-              <td>50</td>
-              <td>21</td>
-              <td>29</td>
-              </tr>
+
 
           </table>
       </div>
@@ -166,17 +137,17 @@
               </tr>
               <tr>
               <td>Дней до зарплаты:</td>
-              <td>25</td>
+              <td>{{ delta}}</td>
               </tr>
                <tr>
               <td>Накопления на счете:
               <table>
                   <tr>
-                      <td><b>250</b></td>
+                      <td><b>{{sum_euro}}</b></td>
                   <td> Евро</td>
                   </tr>
                   <tr>
-                      <td><b>500</b></td>
+                      <td><b>{{sum_dollars}}</b></td>
                   <td> Долларов</td>
                   </tr>
               </table>
@@ -188,6 +159,8 @@
         <p> </p>
     {% if flag == True %}
     <a href="success_logout" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Выйти из аккаунта</a>
+        <p> </p>
+        <a href="user_settings" class="btn btn-secondary" role="button" aria-pressed="true" id="settings"> Настройки </a>
     {% else %}
     <a href="login_form" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Войти в аккаунт</a>
         <a href="registration_form" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true">Зарегистрироваться</a>

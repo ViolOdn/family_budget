@@ -4,7 +4,8 @@ from new_django_project.views import main_page
 from new_django_project.views import show_login_form, check_name
 from new_django_project.views import login_user, do_logout, show_registration_form, register, homework, ajax_path
 from django.contrib import admin
-from new_django_project.views import show_categories, add_type, add_new_flow_of_funds, cash_test, cash_test_2
+from new_django_project.views import show_categories, add_type, add_new_flow_of_funds, show_plan_form
+from new_django_project.views import user_plan_settings
 
 
 urlpatterns = [
@@ -22,7 +23,6 @@ urlpatterns = [
     path('show_categories', show_categories),
     path('add_type', add_type),
     path('add_new_flow_of_funds', add_new_flow_of_funds),
-    path('cash', cash_test),
-    path('cash-2', cash_test_2),
-
+    path('user_settings', show_plan_form),
+    path('user_plan_settings', user_plan_settings)
 ]

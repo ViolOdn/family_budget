@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Настройка плана расходов</title>
+</head>
+<body>
+<form method="post" action="/user_plan_settings">
+  <div class="form-group">
+    <label for="formGroupExampleInput">День зарплаты</label>
+    <input type="number" class="form-control" placeholder="введите число" name="salary_date" id="salary" >
+  </div>
+
+  <div class="form-group">
+    <label for="formGroupExampleInput">Накопления в евро</label>
+    <input type="number" class="form-control" placeholder="евро" name="sum_euro">
+  </div>
+
+  <div class="form-group">
+    <label for="formGroupExampleInput">Накопления в долларах</label>
+    <input type="number" class="form-control" placeholder="доллары" name="sum_dollars">
+  </div>
+Ваш план расходов:
+    {%for exp in categories%}
+ <div class="form-group">
+    <label for="formGroupExampleInput">{{exp.type_name}}</label>
+    <input type="number" class="form-control" placeholder="{{exp.type_name}}" \
+           name="{{exp.type_name}}" id="sum_{{exp.type_id}}" >
+  </div>
+    {% endfor %}
+     <button type="submit" class="btn btn-primary" id="reg1"> Сохранить изменения </button>
+</form>
+</body>
+</html>
