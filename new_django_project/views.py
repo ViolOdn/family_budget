@@ -37,10 +37,11 @@ def main_page(request):
 
         plans = ExpensesPlan.objects.filter(user_id=request.user)
         types = Categories.objects.filter(family_id=request.user, is_it_expense=True)
+        i = 0
         names = []
-        ls = types.filter(type_name=types[i].type_name)
-
-
+        while i < len(types):
+            names.append(types.filter(type_name=types[i].type_name).first().type_name)
+            i = i+1
         all_plan_sum = []
         all_money_spent = []
         rest_of_money = []
@@ -49,21 +50,34 @@ def main_page(request):
         while n < len(plans):
             plan = plans[n]
             all_plan_sum.append(plan.sum_plan)
-            money_spent = FlowOfFunds.objects.filter(family_id=request.user, type_id=plan.type_id)
+            money_spent = FlowOfFunds.objects.filter(family_id=request.user)
+            money_spent = money_spent.filter(type_id=plan.type_id) #что блять сука не так какого хера пустое множество
             mon_sum = 0
             for mon in money_spent:
                 mon_sum = mon_sum + mon.sum
-            all_money_spent.append(mon_sum)
-            rest_of_money.append(plan.sum_plan-mon_sum)
+            all_money_spent.append(abs(mon_sum))
+            rest_of_money.append(plan.sum_plan-abs(mon_sum))
             n = n+1
+        final_list = []
+        fl = []
+        i = 0
+        while i < len(names):
+            fl = []
+            fl.append(names[i])
+            fl.append(all_plan_sum[i])
+            fl.append(all_money_spent[i])
+            fl.append(rest_of_money[i])
+            final_list.append(fl)
+            i = i+1
+        days = SavingMoney.objects.filter(user_id=request.user).first().days_before_salary
+
 
         return render_to_response('index.html', {'name': request.user.username, 'flag': True,\
                                                  'flows': FlowOfFunds.objects.filter(family_id=request.user),\
                                                  'money': sum, 'delta': SavingMoney.objects.filter(user_id=request.user).first().days_before_salary, \
                                                  'sum_euro': SavingMoney.objects.filter(user_id=request.user).first().euro, \
                                                  'sum_dollars': SavingMoney.objects.filter(user_id=request.user).first().dollars, \
-                                  'plans': ExpensesPlan.objects.filter(user_id=request.user), 'all_plan_sum': all_plan_sum, \
-                                                'all_money_spent': all_money_spent, 'rest_of_money': rest_of_money})
+                                  'plans': final_list})
     else:
         return render_to_response('index.html', {'flag': False})
 
@@ -179,76 +193,6 @@ def add_new_flow_of_funds(request):
                                 date=request.POST['flow_date'])
     flow_of_funds.save()
     return HttpResponseRedirect('/')
-    #return HttpResponse('Расход/доход добавлен. Нажмите кнопку "назад" или Backspace, чтобы вернуться на главную страницу')
-
-
-
-'''
-def cash_test(request):
-    start = datetime.now()
-    client = Client(('localhost', 11211))
-    expenses = client.get('expenses')
-    if expenses is None:
-        expenses = []
-        i = 1
-        while i < 30000:
-            s = FlowOfFunds.objects.filter(family_id=random.randint(1, 4)).first()
-            expenses.append(s)
-            i = i+1
-        client.set(
-            'expenses',
-            pickle.dumps(expenses),
-            expire=60
-        )
-    else:
-        expenses = pickle.loads(expenses)
-    finish = datetime.now()
-    delta = (finish-start).total_seconds()
-    return HttpResponse(str(delta))
-
-
-def no_cash(request):
-    start = datetime.now()
-    expenses = []
-    i = 1
-    types = []
-    time = ''
-    while i < 30000:
-        s = FlowOfFunds.objects.filter(family_id=random.randint(1, 4)).first()
-        expenses.append(s)
-        i = i+1
-    delta = (datetime.now()-start).total_seconds()
-    time = str(delta) + ' seconds'
-    return HttpResponse(time)
-
-
-#def client(request):
-
-
-def client_add_new_human(request):
-    requests.post(
-        'http://127.0.0.1:8000/new_human',
-        {
-        'name': 'Джон',
-        'age': 55
-        }
-    )
-    
-def server_add_new_human(request):
-    human = Human(name=request.POST['name'], age=request.POST['age'])
-    human.save()
-    return JsonResponse({'adding status': 'OK'})
-
-
-def client_upgrate_human(request):
-    request.POST(
-        'http://127.0.0.1:8000/update_human',
-        {
-            'name': 'Джон',
-            'age': 56
-        }
-    )
-'''
 
 
 def show_plan_form(request):
@@ -277,7 +221,7 @@ def user_plan_settings(request):
                                dollars=request.POST['sum_dollars'], days_before_salary=delta)
     saving_money.save()
 
-    ExpensesPlan.objects.filter(user_id=request.user).delete()
+    #ExpensesPlan.objects.filter(user_id=request.user).delete()
     while i < n:
         current_type_id = types.filter(type_name=types[i].type_name).first().type_id
         new_id = Categories.objects.filter(family_id=request.user, is_it_expense=True, type_name=types[i].type_name).first().type_id
@@ -287,8 +231,10 @@ def user_plan_settings(request):
             float_sum = old_sum.replace(',', '.')
         else:
             float_sum = request.POST[field_name]
+        ExpensesPlan.objects.filter(user_id=request.user).delete()
         expenses_plan = ExpensesPlan(user_id=request.user, type_id=types.filter(type_name=types[i].type_name).first(), sum_plan=float_sum, start_date=start_salary_date, finish_date=finish_salary_date)
         expenses_plan.save()
         i = i+1
 
-    return HttpResponseRedirect('/''')
+    #return HttpResponseRedirect('/''')
+    return HttpResponse('ok')

@@ -108,11 +108,11 @@
               </tr>
               {% for plan in plans %}
               <tr>
-              <td>{{ plan }}</td>
-              <td>150</td>
-              <td>70</td>
-              <td>80</td>
+              {% for ls in plan %}
+              <td>{{ ls }}</td>
+                  {% endfor %}
               </tr>
+              {% endfor %}
 
 
           </table>

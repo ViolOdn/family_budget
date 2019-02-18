@@ -4,3 +4,4 @@ from new_django_project.models import *
 admin.site.register(Categories)
 admin.site.register(FlowOfFunds)
 admin.site.register(ExpensesPlan)
+admin.site.register(SavingMoney)
