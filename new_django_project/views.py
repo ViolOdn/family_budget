@@ -34,50 +34,71 @@ def main_page(request):
         '''
         записать новый словарь с нужными полями из расходов, потом его по значению передать на главную в таблицу
         '''
+        if SavingMoney.objects.filter(user_id=request.user):
+            today = str(datetime.today())
+            year = int(today[0:4])
+            month = int(today[5:7])
+            day = int(today[8:10])
+            sal_day = int(SavingMoney.objects.filter(user_id=request.user).first().salary_day)
+            start_salary_date = datetime(year, month, sal_day)
+            today_date = datetime(year, month, day)
+            if sal_day < day:
+                if month < 12:
+                    finish_salary_date = datetime(year, month + 1, sal_day)
+                else:
+                    finish_salary_date = datetime(year + 1, 1, sal_day)
+            else:
+                n = sal_day - day
+                finish_salary_date = today_date + timedelta(days = n)
+            delta = (finish_salary_date - today_date).days
 
-        plans = ExpensesPlan.objects.filter(user_id=request.user)
-        types = Categories.objects.filter(family_id=request.user, is_it_expense=True)
-        i = 0
-        names = []
-        while i < len(types):
-            names.append(types.filter(type_name=types[i].type_name).first().type_name)
-            i = i+1
-        all_plan_sum = []
-        all_money_spent = []
-        rest_of_money = []
-        n = 0
+            plans = ExpensesPlan.objects.filter(user_id=request.user)
+            types = Categories.objects.filter(family_id=request.user, is_it_expense=True)
+            i = 0
+            names = []
+            while i < len(types):
+                names.append(types.filter(type_name=types[i].type_name).first().type_name)
+                i = i+1
+            all_plan_sum = []
+            all_money_spent = []
+            rest_of_money = []
+            n = 0
 
-        while n < len(plans):
-            plan = plans[n]
-            all_plan_sum.append(plan.sum_plan)
-            money_spent = FlowOfFunds.objects.filter(family_id=request.user)
-            money_spent = money_spent.filter(type_id=plan.type_id) #что блять сука не так какого хера пустое множество
-            mon_sum = 0
-            for mon in money_spent:
-                mon_sum = mon_sum + mon.sum
-            all_money_spent.append(abs(mon_sum))
-            rest_of_money.append(plan.sum_plan-abs(mon_sum))
-            n = n+1
-        final_list = []
-        fl = []
-        i = 0
-        while i < len(names):
+            while n < len(plans):
+                plan = plans[n]
+                all_plan_sum.append(plan.sum_plan)
+                money_spent = FlowOfFunds.objects.filter(family_id=request.user)
+                money_spent = money_spent.filter(type_id=plan.type_id) #что блять сука не так какого хера пустое множество
+                mon_sum = 0
+                for mon in money_spent:
+                    mon_sum = mon_sum + mon.sum
+                all_money_spent.append(abs(mon_sum))
+                rest_of_money.append(plan.sum_plan-abs(mon_sum))
+                n = n+1
+            final_list = []
             fl = []
-            fl.append(names[i])
-            fl.append(all_plan_sum[i])
-            fl.append(all_money_spent[i])
-            fl.append(rest_of_money[i])
-            final_list.append(fl)
-            i = i+1
-        days = SavingMoney.objects.filter(user_id=request.user).first().days_before_salary
+            i = 0
+            while i < len(names):
+                fl = []
+                fl.append(names[i])
+                fl.append(all_plan_sum[i])
+                fl.append(all_money_spent[i])
+                fl.append(rest_of_money[i])
+                final_list.append(fl)
+                i = i+1
+            days = SavingMoney.objects.filter(user_id=request.user).first().salary_day
 
 
-        return render_to_response('index.html', {'name': request.user.username, 'flag': True,\
+            return render_to_response('index.html', {'name': request.user.username, 'flag': True,\
                                                  'flows': FlowOfFunds.objects.filter(family_id=request.user),\
-                                                 'money': sum, 'delta': SavingMoney.objects.filter(user_id=request.user).first().days_before_salary, \
-                                                 'sum_euro': SavingMoney.objects.filter(user_id=request.user).first().euro, \
-                                                 'sum_dollars': SavingMoney.objects.filter(user_id=request.user).first().dollars, \
-                                  'plans': final_list})
+                                                 'money': sum, 'delta': delta, 'plans': final_list, \
+                                                     'sum_euro': SavingMoney.objects.filter(user_id=request.user).first().euro, \
+                                                     'sum_dollars': SavingMoney.objects.filter(user_id=request.user).first().dollars})
+        else:
+            return render_to_response('index.html', {'name': request.user.username, 'flag': True, \
+                                                     'flows': FlowOfFunds.objects.filter(family_id=request.user), \
+                                                     'money': sum})
+
     else:
         return render_to_response('index.html', {'flag': False})
 
@@ -168,12 +189,12 @@ def add_type(request):
             добавление расходов/доходов +
             преобразование дат в соответствующий формат +
             пересчет остатка +
-            отображение таблиц
+            отображение таблиц +
             пересчет планов +
-            Настройки:
+            Настройки: +
             - накопления
             - день зп
-            - 
+            
 '''
 
 
@@ -205,23 +226,29 @@ def user_plan_settings(request):
     types = Categories.objects.filter(family_id=request.user, is_it_expense=True)
     n = len(types)
     i = 0
+
     today = str(datetime.today())
     year = int(today[0:4])
-    month = int(today[6:7])
-    sal_day = int(request.POST['salary_date'])
+    month = int(today[5:7])
+    day = int(today[9:11])
+    sal_day = int(SavingMoney.objects.filter(user_id=request.user).first().salary_day)
     start_salary_date = datetime(year, month, sal_day)
-    if month < 12:
-        finish_salary_date = datetime(year, month+1, sal_day)
+    today_date = datetime(year, month, day)
+    if sal_day > day:
+        if month < 12:
+            finish_salary_date = datetime(year, month + 1, sal_day)
+        else:
+            finish_salary_date = datetime(year + 1, 1, sal_day)
     else:
-        finish_salary_date = datetime(year+1, 1, sal_day)
-    delta = (finish_salary_date - start_salary_date).days
+        finish_salary_date = today_date + (sal_day - day)
+    delta = (finish_salary_date - today_date).days
 
     SavingMoney.objects.filter(user_id=request.user).delete()
     saving_money = SavingMoney(user_id=request.user, euro=request.POST['sum_euro'], \
-                               dollars=request.POST['sum_dollars'], days_before_salary=delta)
+                               dollars=request.POST['sum_dollars'], salary_day=request.POST['salary_date'])
     saving_money.save()
 
-    #ExpensesPlan.objects.filter(user_id=request.user).delete()
+    ExpensesPlan.objects.filter(user_id=request.user).delete()
     while i < n:
         current_type_id = types.filter(type_name=types[i].type_name).first().type_id
         new_id = Categories.objects.filter(family_id=request.user, is_it_expense=True, type_name=types[i].type_name).first().type_id
@@ -231,10 +258,10 @@ def user_plan_settings(request):
             float_sum = old_sum.replace(',', '.')
         else:
             float_sum = request.POST[field_name]
-        ExpensesPlan.objects.filter(user_id=request.user).delete()
+        #ExpensesPlan.objects.filter(user_id=request.user).delete()
         expenses_plan = ExpensesPlan(user_id=request.user, type_id=types.filter(type_name=types[i].type_name).first(), sum_plan=float_sum, start_date=start_salary_date, finish_date=finish_salary_date)
         expenses_plan.save()
         i = i+1
 
-    #return HttpResponseRedirect('/''')
-    return HttpResponse('ok')
+    return HttpResponseRedirect('/''')
+    #return HttpResponse('ok')

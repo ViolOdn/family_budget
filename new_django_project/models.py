@@ -51,7 +51,7 @@ class SavingMoney(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     euro = models.FloatField(default=0)
     dollars = models.FloatField(default=0)
-    days_before_salary = models.IntegerField(default=0)
+    salary_day = models.IntegerField(default=0)
 
 '''
 class Human(models.Model):
