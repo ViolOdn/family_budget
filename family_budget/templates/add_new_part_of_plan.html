@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Обновление плана расходов</title>
+</head>
+<body>
+План расходов по новой категории:
+<form method="post" action="/add_new_part">
+  <div class="form-group">
+    <label for="formGroupExampleInput">{{ new_type }}</label>
+   <input type="number" class="form-control" placeholder="{{new_type}}" \
+           name="new_type_name" >
+  </div>
+    <button type="submit" class="btn btn-primary" id="reg1"> Сохранить изменения </button>
+</form>
+</body>
+</html>

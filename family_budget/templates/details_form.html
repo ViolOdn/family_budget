@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Выгрузить отчет</title>
+</head>
+<body>
+Выберите период времени, за который вы хотите увидеть отчет о доходах и расходах:
+<form method="post" action="/get_details_info" id="get_details">
+<div class="form-group">
+    <label for="formGroupExampleInput">Дата начала</label>
+    <input type="date" class="form-control" placeholder="выберите дату начала" name="start_date" >
+  </div>
+<div class="form-group">
+    <label for="formGroupExampleInput">Дата окончания</label>
+    <input type="date" class="form-control" placeholder="выберите дату окончания" name="finish_date" >
+    <p> </p>
+   <button type="submit" class="btn btn-primary" id="add_flow"> Получить отчет </button>
+  </div>
+</form>
+</body>
+</html>
