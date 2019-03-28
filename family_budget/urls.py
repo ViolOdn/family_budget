@@ -3,7 +3,6 @@ from family_budget.views import *
 from django.contrib import admin
 
 urlpatterns = [
-    path('mypath', myfunc),
     path('', main_page),
     path('login_form', show_login_form),
     path('login', login_user),

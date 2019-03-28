@@ -12,7 +12,7 @@ def main_page(request):
     if request.user.is_authenticated:
         incomes = FlowOfFunds.objects.filter(family_id=request.user)
         sum = 0
-       # sum = FlowOfFunds.objects.filter(family_id=request.user).aggregate(Sum('sum')) - как это работает?
+        #sum = FlowOfFunds.objects.filter(family_id=request.user).aggregate(Sum('sum')) #как это работает?
         for inc in incomes:
             sum = sum + inc.sum
         if SavingMoney.objects.filter(user_id=request.user):
@@ -25,13 +25,13 @@ def main_page(request):
             sal_day = SavingMoney.objects.filter(user_id=request.user).first().salary_day
             # start_salary_date = datetime(year, month, sal_day)
             today_date = datetime.fromordinal(today.toordinal())
-            if sal_day < today().day:
-                if today().month < 12:
-                    finish_salary_date = datetime(today().year, today().month + 1, sal_day)
+            if sal_day < today.day:
+                if today.month < 12:
+                    finish_salary_date = datetime(today.year, today.month + 1, sal_day)
                 else:
-                    finish_salary_date = datetime(today().year + 1, 1, sal_day)
+                    finish_salary_date = datetime(today.year + 1, 1, sal_day)
             else:
-                n = sal_day - today().day
+                n = sal_day - today.day
                 finish_salary_date = today_date + timedelta(days=n)
             delta = (finish_salary_date - today_date).days
 
@@ -164,7 +164,11 @@ def add_type(request):
         exp_type = False
     categories = Categories(family_id=request.user, type_name=request.POST['expense_type'], is_it_expense=exp_type)
     categories.save()
-    return render_to_response('add_new_part_of_plan.html', {'new_type': Categories.objects.filter(is_it_expense=True).last().type_name})
+    if Categories.objects.last().is_it_expense == True:
+        return render_to_response('add_new_part_of_plan.html', {'new_type': Categories.objects.filter(is_it_expense=True).last().type_name})
+    else:
+        return HttpResponseRedirect('/')
+
 
 '''
 def show_new_part_form(request):
