@@ -3,16 +3,6 @@ from django.contrib.auth.models import User
 from datetime import datetime
 from django import utils
 
-'''
-class Family(models.Model):
-    family_id = models.IntegerField(default=1)
-    family_name = models.ForeignKey(User, on_delete=models.CASCADE)
-    family_email = models.CharField(max_length=100, default="")
-    password_hash = models.CharField(max_length=500, default="")
-
-    def __repr__(self):
-        return self.family_name + ' ' + self.password_hash
-'''
 
 '''
 class FamilyMembers(models.Model):
@@ -51,9 +41,3 @@ class SavingMoney(models.Model):
     euro = models.FloatField(default=0)
     dollars = models.FloatField(default=0)
     salary_day = models.IntegerField(default=0)
-
-'''
-class Human(models.Model):
-    name = models.TextField(max_length=50)
-    age = models.IntegerField(default=1)
-'''

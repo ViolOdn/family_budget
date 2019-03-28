@@ -1,1 +1,5 @@
 Lib
+.idea
+Scripts
+pip-selfcheck.json
+pyvenv.cfg

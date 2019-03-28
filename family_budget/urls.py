@@ -1,12 +1,6 @@
 from django.urls import include, path
-from family_budget.views import myfunc
-from family_budget.views import main_page
-from family_budget.views import show_login_form, check_name
-from family_budget.views import login_user, do_logout, show_registration_form, register, homework, ajax_path
+from family_budget.views import *
 from django.contrib import admin
-from family_budget.views import show_categories, add_type, add_new_flow_of_funds, show_plan_form
-from family_budget.views import user_plan_settings, show_details_form, get_details_info, add_new_part
-
 
 urlpatterns = [
     path('mypath', myfunc),

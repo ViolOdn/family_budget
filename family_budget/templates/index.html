@@ -13,7 +13,7 @@
 <body>
     <h1><div align=" center ">
         <div style="color:darkviolet">
-              {% if flag == True %}
+              {% if flag }
               Бюджет {{ name }}
                   <p> </p>
               {% else %}
@@ -114,7 +114,13 @@
               {% for plan in plans %}
               <tr>
               {% for ls in plan %}
-              <td>{{ ls }}</td>
+              <td style="background-color:
+                      {% if ls < 0%}
+                      #FFFF00
+                      {% endif %}
+                  ">
+                  {{ ls }}
+              </td>
                   {% endfor %}
               </tr>
               {% endfor %}
